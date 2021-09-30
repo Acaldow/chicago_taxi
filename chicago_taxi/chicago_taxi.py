@@ -1,4 +1,3 @@
-from typing import List
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 from pyspark.sql.dataframe import DataFrame
@@ -6,11 +5,11 @@ from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
 
-def make_kpis(df: DataFrame)-> DataFrame:
+def make_kpis(df: DataFrame) -> DataFrame:
     return df.groupBy('community_area', 'timestamp').agg(F.count('taxi_id').alias('amount of taxis'))
 
 
-def filter_duplicates(df: DataFrame, subset: List[str])-> DataFrame:  
+def filter_duplicates(df: DataFrame, subset: List[str]) -> DataFrame:  
     return df.drop_duplicates(subset)
 
 
@@ -46,3 +45,6 @@ kpi_df = make_kpis(final_df)
 
 final_df.write.format("bigquery")\
               .option("table", "taxi_data.taxi_location")
+
+kpi_df.write.format("bigquery")\
+            .option("table", "taxi_data.taxi_kpis")
