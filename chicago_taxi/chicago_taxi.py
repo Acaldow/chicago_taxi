@@ -5,21 +5,22 @@ from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
 
-def make_kpis(df: DataFrame) -> DataFrame:
+def make_kpis(df):
     return df.groupBy('community_area', 'timestamp').agg(F.count('taxi_id').alias('amount of taxis'))
 
 
-def filter_duplicates(df: DataFrame, subset: List[str]) -> DataFrame:  
+def filter_duplicates(df, subset):  
     return df.drop_duplicates(subset)
 
 
 sc = SparkContext()
 spark = SparkSession(sc)
+spark.conf.set("temporaryGcsBucket", "taxi_data_temp")
 
 sc.setLogLevel("ERROR")
 
 taxi_data = spark.read.format("bigquery")\
-                      .option("table", "`bigquery-public-data.chicago_taxi_trips.taxi_trips`")\
+                      .option("table", "bigquery-public-data:chicago_taxi_trips.taxi_trips")\
                       .load()
 
 df_pickup = taxi_data.select('taxi_id', 
@@ -44,7 +45,9 @@ final_df = filter_duplicates(df=taxi_location_df, subset=['taxi_id', 'timestamp'
 kpi_df = make_kpis(final_df)
 
 final_df.write.format("bigquery")\
-              .option("table", "taxi_data.taxi_location")
+              .option("table", "taxi_data.taxi_location")\
+              .save()
 
 kpi_df.write.format("bigquery")\
-            .option("table", "taxi_data.taxi_kpis")
+            .option("table", "taxi_data.taxi_kpis")\
+            .save()
