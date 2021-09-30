@@ -6,8 +6,13 @@ from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
 
-def filter_duplicates(df: DataFrame, subset: List[str])-> DataFrame :  
+def make_kpis(df: DataFrame)-> DataFrame:
+    return df.groupBy('community_area', 'timestamp').agg(F.count('taxi_id').alias('amount of taxis'))
+
+
+def filter_duplicates(df: DataFrame, subset: List[str])-> DataFrame:  
     return df.drop_duplicates(subset)
+
 
 sc = SparkContext()
 spark = SparkSession(sc)
@@ -37,8 +42,7 @@ taxi_location_df = df_pickup.unionByName(df_dropoff)
 
 final_df = filter_duplicates(df=taxi_location_df, subset=['taxi_id', 'timestamp'])
 
-kpi_df = final_df.groupBy('community_area', 'timestamp').agg(F.count('taxi_id').alias('amount of taxis'))
+kpi_df = make_kpis(final_df)
 
 final_df.write.format("bigquery")\
               .option("table", "taxi_data.taxi_location")
-             
