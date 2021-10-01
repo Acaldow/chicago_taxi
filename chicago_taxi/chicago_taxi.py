@@ -6,7 +6,7 @@ from pyspark.sql import types as T
 
 
 def make_kpis(df):
-    return df.groupBy('community_area', 'timestamp').agg(F.count('taxi_id').alias('amount of taxis'))
+    return df.groupBy('community_area', 'timestamp').agg(F.count('taxi_id').alias('amount_of_taxis'))
 
 
 def filter_duplicates(df, subset):  
