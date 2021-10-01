@@ -3,7 +3,4 @@ __pypackages__/
 .pytest_cache/
 .vscode/
 chicago_taxi_exploration.ipynb
-.pdm.toml
-pdm.lock
-pyproject.toml
 taxi_data.csv
