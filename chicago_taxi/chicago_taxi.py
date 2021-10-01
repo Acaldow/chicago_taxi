@@ -46,8 +46,10 @@ kpi_df = make_kpis(final_df)
 
 final_df.write.format("bigquery")\
               .option("table", "taxi_data.taxi_location")\
+              .mode("overwrite")\
               .save()
 
 kpi_df.write.format("bigquery")\
             .option("table", "taxi_data.taxi_kpis")\
+            .mode("overwrite")\
             .save()
